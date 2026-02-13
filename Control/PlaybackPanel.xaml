@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<UserControl
+    x:Class="FluentDesigner.Control.PlaybackPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FluentDesigner.Control"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Padding="12" 
+          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+          CornerRadius="8"
+          ColumnSpacing="12">
+
+        <Grid RowSpacing="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" 
+                       Text="Playback Control" 
+                       Style="{StaticResource SubtitleTextBlockStyle}"/>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="4">
+                <Button x:Name="EnterPlayModeButton" 
+                        Click="OnEnterPlayModeClicked"
+                        ToolTipService.ToolTip="Enter Play Mode"
+                        Width="40" Height="36">
+                    <Image Source="ms-appx:///Assets/Icons/Light/VideoPlay.png" Width="14" Height="14"/>
+                </Button>
+
+                <Button x:Name="PlayButton" 
+                        Click="OnPlayClicked" 
+                        IsEnabled="False"
+                        ToolTipService.ToolTip="Play"
+                        Width="40" Height="36">
+                    <Image Source="ms-appx:///Assets/Icons/Light/VideoPlay.png" Width="14" Height="14"/>
+                </Button>
+
+                <Button x:Name="PauseButton" 
+                        Click="OnPauseClicked" 
+                        IsEnabled="False"
+                        ToolTipService.ToolTip="Pause"
+                        Width="40" Height="36">
+                    <Image Source="ms-appx:///Assets/Icons/Light/VideoPause.png" Width="14" Height="14"/>
+                </Button>
+
+                <Button x:Name="ResetButton" 
+                        Click="OnResetClicked" 
+                        IsEnabled="False"
+                        ToolTipService.ToolTip="Reset"
+                        Width="40" Height="36">
+                    <Image Source="ms-appx:///Assets/Icons/Light/RefreshLeft.png" Width="14" Height="14"/>
+                </Button>
+
+                <Button x:Name="RestartButton" 
+                        Click="OnRestartClicked" 
+                        IsEnabled="False"
+                        ToolTipService.ToolTip="Restart"
+                        Width="40" Height="36">
+                    <Image Source="ms-appx:///Assets/Icons/Light/RefreshRight.png" Width="14" Height="14"/>
+                </Button>
+
+                <Button x:Name="ExitPlayModeButton" 
+                        Click="OnExitPlayModeClicked" 
+                        IsEnabled="False"
+                        ToolTipService.ToolTip="Exit Play Mode"
+                        Width="40" Height="36">
+                    <Image Source="ms-appx:///Assets/Icons/Light/SwitchButton.png" Width="14" Height="14"/>
+                </Button>
+            </StackPanel>
+
+            <Grid Grid.Row="2" ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" 
+                           Text="Time:" 
+                           VerticalAlignment="Center"
+                           FontSize="12"/>
+
+                <TextBox x:Name="TimeInputBox" 
+                         Grid.Column="1"
+                         PlaceholderText="mm:ss:ddd"
+                         Text="00:00:000"
+                         IsEnabled="False"
+                         KeyDown="OnTimeInputKeyDown"
+                         LostFocus="OnTimeInputLostFocus"
+                         FontFamily="Consolas"
+                         FontSize="12"/>
+
+                <TextBlock x:Name="TotalTimeText" 
+                           Grid.Column="2" 
+                           Text="/ 00:00:000" 
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           FontFamily="Consolas"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            </Grid>
+
+
+            <Grid Grid.Row="3" ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="48"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" 
+                           Text="Base Speed:" 
+                           VerticalAlignment="Center"
+                           FontSize="12"/>
+
+                <Slider x:Name="BaseSpeedSlider"
+                        Grid.Column="1"
+                        Minimum="1.0"
+                        Maximum="8.0"
+                        StepFrequency="0.1"
+                        TickFrequency="1.0"
+                        TickPlacement="Outside"
+                        Value="1.0"
+                        ValueChanged="OnBaseSpeedChanged"/>
+
+                <TextBlock x:Name="BaseSpeedText" 
+                           Grid.Column="2" 
+                           Text="1.0x"
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           HorizontalAlignment="Right"/>
+            </Grid>
+
+            <InfoBar x:Name="PlaybackInfoBar"
+                     Grid.Row="4"
+                     IsOpen="False"
+                     Severity="Informational"
+                     Title="Playback Mode"
+                     Message="Editing is disabled during playback."
+                     IsClosable="False"
+                     VerticalAlignment="Top"
+                     Margin="0,8,0,0"/>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,296 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<UserControl
+    x:Class="FluentDesigner.Control.RailIndexCurvePanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FluentDesigner.Control"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    mc:Ignorable="d">
+
+    <Grid RowSpacing="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Text="RailIndex Curve"
+                       Style="{StaticResource BodyStrongTextBlockStyle}"
+                       Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                       VerticalAlignment="Center"/>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                <RadioButton x:Name="SamplingModeRadio"
+                             Content="Sampling"
+                             GroupName="RailCurveMode"
+                             Checked="OnModeChanged"
+                             Padding="8,4"
+                             MinWidth="0"/>
+                <RadioButton x:Name="ManualModeRadio"
+                             Content="Manual"
+                             GroupName="RailCurveMode"
+                             Checked="OnModeChanged"
+                             Padding="8,4"
+                             MinWidth="0"/>
+            </StackPanel>
+        </Grid>
+
+        <InfoBar x:Name="RotateWarningInfoBar"
+                 Grid.Row="1"
+                 IsOpen="False"
+                 Severity="Warning"
+                 Title="RailIndex Unavailable"
+                 IsClosable="False"
+                 Margin="8">
+            <InfoBar.Content>
+                <StackPanel Spacing="4">
+                    <TextBlock Text="The following Rotate notes cannot use RailIndex:" 
+                               FontSize="12" Opacity="0.8"/>
+                    <ItemsControl x:Name="RotateNotesList">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Spacing="2"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" FontSize="11" Opacity="0.7"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </InfoBar.Content>
+        </InfoBar>
+
+        <Border x:Name="CanvasBorder"
+                Grid.Row="2"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                CornerRadius="6"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1">
+            <canvas:CanvasControl x:Name="CurveCanvas"
+                                  Draw="OnCanvasDraw"
+                                  SizeChanged="OnCanvasSizeChanged"
+                                  CreateResources="OnCanvasCreateResources"
+                                  PointerPressed="OnCanvasPointerPressed"
+                                  PointerMoved="OnCanvasPointerMoved"
+                                  PointerReleased="OnCanvasPointerReleased"
+                                  PointerCaptureLost="OnCanvasPointerCaptureLost"/>
+        </Border>
+
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel x:Name="SamplingModeControls" 
+                        Grid.Column="0" 
+                        Orientation="Horizontal" 
+                        Spacing="12">
+                <Button x:Name="AddKeyFrameButton" 
+                        Click="OnAddKeyFrameClicked"
+                        ToolTipService.ToolTip="Add KeyFrame">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Image Width="14" Height="14" Source="ms-appx:///Assets/Icons/Light/AddLocation.png"/>
+                        <TextBlock Text="Add" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <ComboBox x:Name="InterpolationComboBox"
+                          SelectionChanged="OnInterpolationChanged"
+                          ToolTipService.ToolTip="Interpolation Type">
+                    <ComboBoxItem Content="Linear" Tag="Linear" IsSelected="True"/>
+                    <ComboBoxItem Content="Step" Tag="Step"/>
+                    <ComboBoxItem Content="Bezier" Tag="Bezier"/>
+                </ComboBox>
+            </StackPanel>
+
+            <TextBlock x:Name="ManualModeHint"
+                       Grid.Column="0"
+                       Text="Drag points vertically to adjust"
+                       Visibility="Collapsed"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       Opacity="0.7"/>
+
+            <Button x:Name="ApplyButton"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    Click="OnApplyClicked"
+                    Style="{StaticResource AccentButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Image Width="14" Height="14" Source="ms-appx:///Assets/Icons/Light/Check.png"/>
+                    <TextBlock Text="Apply" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <Expander x:Name="KeyFrameExpander" 
+                  Grid.Row="4" 
+                  Header="KeyFrames" 
+                  IsExpanded="False" 
+                  HorizontalAlignment="Stretch" 
+                  HorizontalContentAlignment="Stretch">
+            <StackPanel Spacing="4">
+                <ItemsControl x:Name="KeyFrameItemsControl">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Spacing="4"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="local:RailKeyFrameViewModel">
+                            <Expander HorizontalAlignment="Stretch" 
+                  HorizontalContentAlignment="Stretch"
+                  IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}">
+                                <Expander.Header>
+                                    <Grid ColumnSpacing="8" Padding="4,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0"
+                               Text="{x:Bind Index}"
+                               VerticalAlignment="Center"
+                               FontWeight="SemiBold"
+                               Width="24"/>
+
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                            <TextBlock Text="T:" VerticalAlignment="Center" FontSize="12"/>
+                                            <TextBlock Text="{x:Bind TimeDisplay, Mode=OneWay}"
+                                   VerticalAlignment="Center"
+                                   FontFamily="Consolas"
+                                   FontSize="12"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4">
+                                            <TextBlock Text="Rail:" VerticalAlignment="Center" FontSize="12"/>
+                                            <NumberBox Value="{x:Bind RailIndex, Mode=TwoWay}"
+                                   Minimum="0"
+                                   Maximum="359"
+                                   SpinButtonPlacementMode="Compact"
+                                   Width="90"
+                                   ValueChanged="OnKeyFrameValueChanged"/>
+                                        </StackPanel>
+
+                                        <Button Grid.Column="3"
+                            Click="OnRemoveKeyFrameClicked"
+                            Tag="{x:Bind Index}"
+                            Background="Transparent"
+                            ToolTipService.ToolTip="Remove KeyFrame"
+                            Padding="4">
+                                            <Image Width="14" Height="14" Source="ms-appx:///Assets/Icons/Light/DeleteLocation.png"/>
+                                        </Button>
+                                    </Grid>
+                                </Expander.Header>
+
+                                <StackPanel Spacing="8" Padding="8"
+                        Visibility="{x:Bind ShowControlPointsVisibility, Mode=OneWay}">
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" 
+                               Text="Control Points" 
+                               FontWeight="SemiBold" 
+                               VerticalAlignment="Center"/>
+                                        <Button Grid.Column="1" 
+                            Click="OnAddControlPointClicked"
+                            Tag="{x:Bind Index}"
+                            ToolTipService.ToolTip="Add Control Point"
+                            IsEnabled="{x:Bind CanAddControlPoint, Mode=OneWay}"
+                            Padding="4">
+                                            <Image Width="12" Height="12" Source="ms-appx:///Assets/Icons/Light/AddLocation.png"/>
+                                        </Button>
+                                    </Grid>
+
+                                    <ItemsControl ItemsSource="{x:Bind ControlPoints}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Spacing="4"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="local:RailControlPointViewModel">
+                                                <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                    CornerRadius="4"
+                                    Padding="8,4"
+                                    BorderThickness="1"
+                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                                                    <Grid ColumnSpacing="8">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBlock Grid.Column="0" 
+                                               Text="{x:Bind DisplayIndex, Mode=OneWay}" 
+                                               VerticalAlignment="Center" 
+                                               Width="24"
+                                               FontSize="11"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                                            <TextBlock Text="T:" VerticalAlignment="Center" FontSize="11"/>
+                                                            <TextBlock Text="{x:Bind TimeDisplay, Mode=OneWay}"
+                                                   VerticalAlignment="Center"
+                                                   FontFamily="Consolas"
+                                                   FontSize="11"/>
+                                                        </StackPanel>
+
+                                                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4">
+                                                            <TextBlock Text="Rail:" VerticalAlignment="Center" FontSize="11"/>
+                                                            <NumberBox Value="{x:Bind RailIndex, Mode=TwoWay}"
+                                                   Minimum="0"
+                                                   Maximum="359"
+                                                   SpinButtonPlacementMode="Compact"
+                                                   Width="80"
+                                                   ValueChanged="OnControlPointValueChanged"/>
+                                                        </StackPanel>
+
+                                                        <Button Grid.Column="3"
+                                            Click="OnRemoveControlPointClicked"
+                                            Background="Transparent"
+                                            ToolTipService.ToolTip="Remove Control Point"
+                                            Padding="2">
+                                                            <Image Width="12" Height="12" Source="ms-appx:///Assets/Icons/Light/DeleteLocation.png"/>
+                                                        </Button>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <TextBlock Text="No control points. Click + to add."
+                           Visibility="{x:Bind NoControlPointsVisibility, Mode=OneWay}"
+                           FontSize="11"
+                           Opacity="0.6"
+                           FontStyle="Italic"/>
+                                </StackPanel>
+                            </Expander>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Expander>
+    </Grid>
+</UserControl>

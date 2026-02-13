@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "FluentDesigner (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "FluentDesigner (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

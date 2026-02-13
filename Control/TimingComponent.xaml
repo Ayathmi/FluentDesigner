@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="FluentDesigner.Control.TimingComponent"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Spacing="8">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Grid.Column="0"
+                   Source="ms-appx:///Assets/Icons/Light/Clock.png"
+                   Width="18"
+                   Height="18"
+                   Margin="0, 0, 8, 0"/>
+            <TextBlock Grid.Column="1"
+                       Text="Timing"
+                       Style="{StaticResource BodyTextBlockStyle}"/>
+        </Grid>
+
+        <StackPanel Spacing="4">
+            <TextBlock Text="Target Time" FontSize="11" Opacity="0.6"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="4"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="4"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <NumberBox x:Name="TargetMin" Grid.Column="0"
+                           PlaceholderText="Min"
+                           Minimum="0"
+                           SpinButtonPlacementMode="Compact"
+                           ValueChanged="OnTargetMinChanged"/>
+                <NumberBox x:Name="TargetSecond" Grid.Column="2"
+                           PlaceholderText="Sec"
+                           Minimum="0"
+                           Maximum="59"
+                           SpinButtonPlacementMode="Compact"
+                           ValueChanged="OnTargetSecondChanged"/>
+                <NumberBox x:Name="TargetTick" Grid.Column="4"
+                           PlaceholderText="Tick"
+                           Minimum="0"
+                           Maximum="999"
+                           SpinButtonPlacementMode="Compact"
+                           ValueChanged="OnTargetTickChanged"/>
+            </Grid>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

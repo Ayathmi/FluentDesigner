@@ -1,0 +1,447 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="FluentDesigner.Control.HierarchyView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FluentDesigner.Control"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    IsTabStop="True"
+    AllowFocusOnInteraction="True">
+    
+    <UserControl.Resources>
+        <Style x:Key="FontSet" TargetType="MenuFlyoutItem">
+            <Setter Property="FontFamily" Value="{StaticResource MicrosoftYaHei}"></Setter>
+        </Style>
+        <Style x:Key="FluentIconButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="6"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+        </Style>
+
+        <Style x:Key="FluentSmallIconButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+        </Style>
+
+        <MenuFlyout x:Key="EmptyAreaContextMenu">
+            <MenuFlyoutItem Text="New Note" Click="OnCreateEmptyClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/DocumentAdd.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="New Group" Click="OnCreateGroupClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/FolderAdd.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem Text="Copy" Click="OnCopyClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/DocumentCopy.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Paste" Click="OnPasteClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/List.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem Text="Delete" Click="OnDeleteClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/DocumentRemove.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Delete All Notes">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/Delete.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Delete Ungrouped Notes">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/DeleteFilled.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+
+        <MenuFlyout x:Key="ItemContextMenu" >
+            <MenuFlyoutItem Text="New Note" Click="OnCreateEmptyClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/DocumentAdd.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="New Group" Click="OnCreateGroupClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/FolderAdd.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem Text="Rename" Click="OnRenameClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/EditPen.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Delete" Click="OnDeleteClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/DocumentRemove.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Copy" Click="OnCopyClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/DocumentCopy.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Paste" Click="OnPasteClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/List.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem Text="Toggle Activate" Click="OnToggleVisibilityClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/Switch.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Focus" Click="OnFocusClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/View.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+
+        <MenuFlyout x:Key="GroupContextMenu">
+            <MenuFlyoutItem  Text="Expand" Click="OnExpandClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/CaretBottom.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem  Text="Collapse" Click="OnCollapseClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/CaretTop.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem  Text="New Note" Click="OnCreateEmptyClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/DocumentAdd.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem  Text="New Group" Click="OnCreateGroupClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/FolderAdd.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem Text="Rename" Click="OnRenameClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/EditPen.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Delete" Click="OnDeleteClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/DocumentRemove.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem  Text="Copy" Click="OnCopyClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/DocumentCopy.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem  Text="Paste" Click="OnPasteClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/List.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem  Text="Toggle Activate" Click="OnToggleVisibilityClicked">
+                <MenuFlyoutItem.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/Icons/Light/Switch.png"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+
+        <StackLayout x:Key="VirtualizingStackLayout"
+                     Orientation="Vertical"
+                     Spacing="0"/>
+    </UserControl.Resources>
+
+    <Border CornerRadius="8"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            AllowDrop="False"
+            CanDrag="False">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0"
+                    x:Name="HeaderBorder"
+                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                    BorderThickness="0, 0, 0, 1"
+                    CornerRadius="8, 8, 0, 0">
+                <Grid x:Name="HeaderGrid"
+                      MaxHeight="96"
+                      VerticalAlignment="Center"
+                      CornerRadius="8"
+                      Margin="0, 0, 8, 0">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*" MaxHeight="48"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition MaxWidth="36"></ColumnDefinition>
+                        <ColumnDefinition MaxWidth="36"></ColumnDefinition>
+                        <ColumnDefinition MaxWidth="36"></ColumnDefinition>
+                        <ColumnDefinition MaxWidth="36"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Hierarchy" Grid.ColumnSpan="5"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Margin="12,12"
+                               Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    <Grid Grid.Row="1" Grid.Column="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   Text="Interval(ms)"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Center"
+                                   Margin="12,0"
+                                   FontSize="12"/>
+                        <TextBox Grid.Column="1" x:Name="BatchIntervalTextBox"
+                                 Text="0" 
+                                 Width="Auto" 
+                                 PlaceholderText="ms"
+                                 MaxHeight="20"
+                                 Margin="8, 2"
+                                 VerticalAlignment="Center"/>
+                    </Grid>
+                    <Button x:Name="CreateNoteButton"
+                            Grid.Column="1"
+                            Grid.Row="1"
+                            Width="24"
+                            Height="24"
+                            CornerRadius="4"
+                            PointerPressed="OnCreateNoteButtonPointerPressed"
+                            HorizontalAlignment="Center"
+                            Padding="0"
+                            Margin="0">
+                        <Button.Flyout>
+                            <MenuFlyout x:Name="NoteTypeFlyout">
+                                <MenuFlyoutItem Text="Click" Tag="Click" Click="OnNoteTypeMenuItemClick"/>
+                                <MenuFlyoutItem Text="Flick" Tag="Flick" Click="OnNoteTypeMenuItemClick"/>
+                                <MenuFlyoutItem Text="Slide" Tag="Slide" Click="OnNoteTypeMenuItemClick"/>
+                                <MenuFlyoutItem Text="Rail" Tag="Rail" Click="OnNoteTypeMenuItemClick"/>
+                                <MenuFlyoutItem Text="Catch" Tag="Catch" Click="OnNoteTypeMenuItemClick"/>
+                                <MenuFlyoutItem Text="RotateL" Tag="RotateL" Click="OnNoteTypeMenuItemClick"/>
+                                <MenuFlyoutItem Text="RotateR" Tag="RotateR" Click="OnNoteTypeMenuItemClick"/>
+                                <MenuFlyoutItem Text="Guiding" Tag="Guiding" Click="OnNoteTypeMenuItemClick"/>
+                                <MenuFlyoutItem Text="Mine" Tag="Mine" Click="OnNoteTypeMenuItemClick"/>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                        <BitmapIcon UriSource="ms-appx:///Assets/Icons/Light/DocumentAdd.png" Width="16" Height="16"/>
+                    </Button>
+
+                    <Button Grid.Column="2"
+                            Grid.Row="1"
+                            Width="24"
+                            Height="24"
+                            CornerRadius="4"
+                            Click="CreateGroupQuickly"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Padding="0"
+                            Margin="0">
+                        <BitmapIcon UriSource="ms-appx:///Assets/Icons/Light/FolderAdd.png" Width="16" Height="16"/>
+                    </Button>
+
+                    <ToggleButton Grid.Column="3"
+                                  Grid.Row="1"
+                                  Checked="OnIsBatchCreateToggle"
+                                  Unchecked="OnIsBatchCreateToggle"
+                                  IsChecked="False"
+                                  Width="24" Height="24"
+                                  ToolTipService.ToolTip="Toggle Batch Creating"
+                                  BorderThickness="0"
+                                  Background="Transparent"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Padding="0"
+                                  Margin="0">
+                        <BitmapIcon UriSource="ms-appx:///Assets/Icons/Light/Connection.png" Width="14" Height="14"/>
+                    </ToggleButton>
+
+                    <ToggleButton Grid.Column="4"
+                                  Grid.Row="1"
+                                  Checked="OnIsQuickCreateToggle"
+                                  Unchecked="OnIsQuickCreateToggle"
+                                  IsChecked="False"
+                                  Width="24" Height="24"
+                                  BorderThickness="0"
+                                  ToolTipService.ToolTip="Toggle Quick Creating"
+                                  Background="Transparent"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Padding="0"
+                                  Margin="0">
+                        <BitmapIcon UriSource="ms-appx:///Assets/Icons/Light/MagicStick.png" Width="14" Height="14"/>
+                    </ToggleButton>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="1"
+                  x:Name="RootGrid"
+                  Background="{ThemeResource LayerFillColorDefaultBrush}"
+                  AllowDrop="False"
+                  CanDrag="False"
+                  RightTapped="OnRootGridRightTapped">
+
+                <ScrollViewer x:Name="MainScrollViewer"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollMode="Auto"
+                              VerticalScrollMode="Enabled"
+                              HorizontalAlignment="Stretch"
+                              PointerPressed="OnEmptyAreaPointerPressed">
+
+                    <ItemsRepeater x:Name="HierarchyRepeater"
+                                   ItemsSource="{x:Bind FlattenedItems, Mode=OneWay}"
+                                   Layout="{StaticResource VirtualizingStackLayout}"
+                                   ElementPrepared="OnElementPrepared"
+                                   ElementClearing="OnElementClearing">
+
+                        <ItemsRepeater.ItemTemplate>
+
+                            <DataTemplate x:DataType="local:HierarchyFlatItem">
+
+                                <Grid x:Name="ItemRoot"
+                                      Height="32"
+                                      Background="Transparent"
+                                      PointerPressed="OnItemPointerPressed"
+                                      PointerMoved="OnItemPointerMoved"
+                                      PointerReleased="OnItemPointerReleased"
+                                      RightTapped="OnItemRightTapped"
+                                      Padding="4,0,12,0"
+                                      CornerRadius="4"
+                                      HorizontalAlignment="Stretch">
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.BackgroundTransition>
+                                        <BrushTransition Duration="0:0:0.1"></BrushTransition>
+                                    </Grid.BackgroundTransition>
+
+                                    <Button Grid.Column="0"
+                                            Click="OnVisibilityButtonClicked"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Padding="4"
+                                            Width="28"
+                                            Height="28">
+                                        <Image Width="16"
+                                               Height="16"
+                                               Source="{x:Bind VisibilityIconUri, Mode = OneWay}"/>
+                                    </Button>
+
+                                    <Border Grid.Column="1"
+                                            Width="{x:Bind IndentWidth, Mode = OneWay}"/>
+                                    <Button Grid.Column="2"
+                                            Visibility="{x:Bind IsGroupVisibility, Mode = OneWay}"
+                                            Click="OnExpandToggleClicked"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Padding="4"
+                                            Width="24"
+                                            Height="24">
+                                        <Image Width="16"
+                                               Height="16"
+                                               Source="{x:Bind ExpandIconUri, Mode = OneWay}"/>
+                                    </Button>
+                                    <Border Grid.Column="2"
+                                            Width="24"
+                                            Visibility="{x:Bind IsItemVisibility, Mode = OneWay}"/>
+
+                                    <Image Grid.Column="3"
+                                           Margin="4, 0"
+                                           Width="16"
+                                           Height="16"
+                                           Source="ms-appx:///Assets/Icons/Light/Notification.png"/>
+
+                                    <Grid Grid.Column="4" VerticalAlignment="Center">
+                                        <TextBlock x:Name="NameTextBlock"
+                                                   Text="{x:Bind Name, Mode = OneWay}"
+                                                   VerticalAlignment="Center"
+                                                   Padding="2, 0"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Visibility="{x:Bind NameTextBlockVisibility, Mode=OneWay}"/>
+                                        <TextBox x:Name="RenameTextBox"
+                                                 Text="{x:Bind Name, Mode=OneWay}"
+                                                 VerticalAlignment="Bottom"
+                                                 Padding="4, 0"
+                                                 Visibility="{x:Bind RenameTextBoxVisibility, Mode=OneWay}"
+                                                 KeyDown="OnRenameTextBoxKeyDown"
+                                                 LostFocus="OnRenameTextBoxLostFocus"
+                                                 MaxHeight="24"
+                                                 MaxLength="255"/>
+                                    </Grid>
+
+                                    <Border Grid.ColumnSpan="5"
+                                            Background="{ThemeResource SystemControlHighlightAccentBrush}"
+                                            Opacity="0.5"
+                                            CornerRadius="4"
+                                            Visibility="{x:Bind IsSelectedVisibility, Mode = OneWay}"
+                                            IsHitTestVisible="False"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </ScrollViewer>
+
+                <Canvas x:Name="DragPreviewCanvas"
+                        IsHitTestVisible="False"
+                        Visibility="Collapsed">
+                    <Border x:Name="DragPreviewBorder"
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="8,4">
+                        <TextBlock x:Name="DragPreviewText"
+                                   Opacity="0.9"
+                                   FontSize="12"/>
+                    </Border>
+                </Canvas>
+
+                <Border x:Name="DropIndicator"
+                        Height="2"
+                        CornerRadius="2"
+                        Background="{ThemeResource SystemControlHighlightListAccentHighBrush}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Top"
+                        Visibility="Collapsed"
+                        IsHitTestVisible="False"/>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

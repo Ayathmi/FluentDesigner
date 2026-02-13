@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application
+    x:Class="FluentDesigner.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FluentDesigner">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+            </ResourceDictionary.MergedDictionaries>
+            <FontFamily x:Key="MicrosoftYaHei">Microsoft YaHei, Microsoft YaHei UI, Segoe UI</FontFamily>
+
+            <Style TargetType="MenuFlyoutItem">
+                <Setter Property="FontFamily" Value="{StaticResource MicrosoftYaHei}"/>
+            </Style>
+
+            <Style TargetType="MenuFlyoutSubItem">
+                <Setter Property="FontFamily" Value="{StaticResource MicrosoftYaHei}"/>
+            </Style>
+
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <x:String x:Key="NoteIcon">ms-appx:///Assets/Icons/Light/Flim.ico</x:String>
+                    <x:String x:Key="CloseIcon">ms-appx:///Assets/Icons/Light/Close.ico</x:String>
+                    <x:String x:Key="CheckIcon">ms-appx:///Assets/Icons/Light/Check.ico</x:String>
+                </ResourceDictionary>
+
+                <ResourceDictionary x:Key="Dark">
+                    <x:String x:Key="NoteIcon">ms-appx:///Assets/Icons/Dark/Flim.ico</x:String>
+                    <x:String x:Key="CloseIcon">ms-appx:///Assets/Icons/Dark/Close.ico</x:String>
+                    <x:String x:Key="CheckIcon">ms-appx:///Assets/Icons/Dark/Check.ico</x:String>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

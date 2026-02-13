@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<UserControl
+    x:Class="FluentDesigner.Control.VelocityCurveComponent"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FluentDesigner.Control"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <local:BoolToHighlightBrushConverter x:Key="BoolToHighlightBrushConverter"/>
+    </UserControl.Resources>
+
+    <Grid RowSpacing="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Grid.Column="0"
+                   Source="ms-appx:///Assets/Icons/Light/TrendCharts.png"
+                   Width="18"
+                   Height="18"
+                   Margin="0, 0, 8, 0"/>
+            <TextBlock Grid.Column="1"
+                       Text="Velocity Curve"
+                       Style="{StaticResource BodyTextBlockStyle}"/>
+        </Grid>
+
+        <InfoBar x:Name="InsufficientKeyFramesInfoBar"
+                 Grid.Row="1"
+                 IsOpen="{x:Bind InsufficientKeyFramesVisibility, Mode=OneWay}"
+                 Severity="Warning"
+                 Title="Insufficient KeyFrames"
+                 Message="At least 2 keyframes are required to generate a curve. The first keyframe will be at the left edge and the last at the right edge."
+                 IsClosable="False"
+                 Margin="0,0,0,8"/>
+
+        <Border Grid.Row="1" 
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                CornerRadius="6" 
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1">
+            <canvas:CanvasControl x:Name="CurveCanvas" 
+                                  Draw="OnCanvasDraw" 
+                                  SizeChanged="OnCanvasSizeChanged"
+                                  CreateResources="OnCanvasCreateResources"
+                                  PointerPressed="OnCanvasPointerPressed"
+                                  PointerMoved="OnCanvasPointerMoved"
+                                  PointerReleased="OnCanvasPointerReleased"
+                                  PointerCaptureLost="OnCanvasPointerCaptureLost"/>
+        </Border>
+
+        <Expander Grid.Row="2" Header="KeyFrames" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+            <StackPanel Spacing="8">
+                <Button x:Name="AddKeyFrameButton" Click="OnAddKeyFrameClicked" HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Image Width="14" Height="14" Source="ms-appx:///Assets/Icons/Light/AddLocation.png"/>
+                        <TextBlock Text="Add KeyFrame" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <ItemsControl x:Name="KeyFrameItemsControl" 
+                              ItemsSource="{x:Bind KeyFrameItems}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Spacing="4"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="local:KeyFrameItemViewModel">
+                            <Expander HorizontalAlignment="Stretch" 
+                                      HorizontalContentAlignment="Stretch"
+                                      IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}">
+                                <Expander.Header>
+                                    <Grid ColumnSpacing="8" Padding="4,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" 
+                                                   Text="{x:Bind Index}" 
+                                                   VerticalAlignment="Center" 
+                                                   FontWeight="SemiBold"
+                                                   Width="24"/>
+
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                            <TextBlock Text="T:" VerticalAlignment="Center"/>
+                                            <TextBox Text="{x:Bind TimeString, Mode=TwoWay}" 
+                                                     Width="70"
+                                                     PlaceholderText="0.000"
+                                                     LostFocus="OnKeyFrameTimeChanged"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4">
+                                            <TextBlock Text="V:" VerticalAlignment="Center"/>
+                                            <TextBox Text="{x:Bind ValueString, Mode=TwoWay}" 
+                                                     Width="60"
+                                                     PlaceholderText="0.000"
+                                                     LostFocus="OnKeyFrameValueChanged"/>
+                                        </StackPanel>
+
+                                        <Button Grid.Column="3" 
+                                                Click="OnRemoveKeyFrameClicked"
+                                                Tag="{x:Bind Index}"
+                                                Background="Transparent"
+                                                ToolTipService.ToolTip="Remove KeyFrame">
+                                            <Image Width="14" Height="14" Source="ms-appx:///Assets/Icons/Light/DeleteLocation.png"/>
+                                        </Button>
+                                    </Grid>
+                                </Expander.Header>
+
+                                <StackPanel Spacing="8" Padding="8">
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Interpolation:" VerticalAlignment="Center"/>
+                                        <ComboBox Grid.Column="1" 
+                                                  SelectedIndex="{x:Bind InterpolationIndex, Mode=TwoWay}"
+                                                  SelectionChanged="OnKeyFrameInterpolationChanged"
+                                                  Tag="{x:Bind Index}"
+                                                  HorizontalAlignment="Stretch">
+                                            <ComboBoxItem Content="Linear" Tag="Linear"/>
+                                            <ComboBoxItem Content="Bezier" Tag="Bezier"/>
+                                            <ComboBoxItem Content="CatmullRom" Tag="CatmullRom"/>
+                                            <ComboBoxItem Content="Step" Tag="Step"/>
+                                        </ComboBox>
+                                    </Grid>
+
+                                    <InfoBar x:Name="LastFrameInfoBar"
+                                             IsOpen="{x:Bind IsLastFrame, Mode=OneWay}"
+                                             Severity="Informational"
+                                             Title="Last KeyFrame"
+                                             Message="No interpolation will be performed for no next KeyFrame."
+                                             IsClosable="False"/>
+
+                                    <StackPanel Spacing="8" 
+                                                Visibility="{x:Bind ShowControlPoints, Mode=OneWay}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" 
+                                                       Text="Control Points" 
+                                                       FontWeight="SemiBold" 
+                                                       VerticalAlignment="Center"/>
+                                            <Button Grid.Column="1" 
+                                                    Click="OnAddControlPointClicked"
+                                                    Tag="{x:Bind Index}"
+                                                    ToolTipService.ToolTip="Add Control Point"
+                                                    IsEnabled="{Binding CanAddControlPoint}">
+                                                <Image Width="12" Height="12" Source="ms-appx:///Assets/Icons/Light/AddLocation.png"/>
+                                            </Button>
+                                        </Grid>
+
+                                        <ItemsControl ItemsSource="{x:Bind ControlPoints}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Spacing="4"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="local:ControlPointItemViewModel">
+                                                    <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                                            CornerRadius="4"
+                                                            Padding="8,4"
+                                                            BorderThickness="2"
+                                                            BorderBrush="{x:Bind IsSelected, Mode=OneWay, Converter={StaticResource BoolToHighlightBrushConverter}}">
+                                                        <Grid ColumnSpacing="8">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <TextBlock Grid.Column="0" 
+                                                                       Text="{x:Bind Index}" 
+                                                                       VerticalAlignment="Center" 
+                                                                       Width="20"
+                                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+
+                                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                                                <TextBlock Text="X:" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                                <TextBox Text="{x:Bind XString, Mode=TwoWay}" 
+                                                                         Width="55"
+                                                                         PlaceholderText="0-1"
+                                                                         LostFocus="OnControlPointChanged"
+                                                                         ToolTipService.ToolTip="Progress between keyframes (0-1)"/>
+                                                            </StackPanel>
+
+                                                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4">
+                                                                <TextBlock Text="Y:" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                                <TextBox Text="{x:Bind YString, Mode=TwoWay}" 
+                                                                         Width="55"
+                                                                         PlaceholderText="-5~5"
+                                                                         LostFocus="OnControlPointChanged"
+                                                                         ToolTipService.ToolTip="Value offset (-5 to +5)"/>
+                                                            </StackPanel>
+
+                                                            <Button Grid.Column="3" 
+                                                                    Click="OnRemoveControlPointClicked"
+                                                                    Background="Transparent"
+                                                                    ToolTipService.ToolTip="Remove Control Point">
+                                                                <Image Width="12" Height="12" Source="ms-appx:///Assets/Icons/Light/Delete.png"/>
+                                                            </Button>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <TextBlock Text="No control points."
+                                                   Visibility="{x:Bind HasNoControlPoints, Mode=OneWay}"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                   FontSize="12"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock x:Name="NoKeyFramesText"
+                           Text="No keyframes."
+                           Visibility="{x:Bind NoKeyFramesVisibility, Mode=OneWay}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,8"/>
+            </StackPanel>
+        </Expander>
+    </Grid>
+</UserControl>
